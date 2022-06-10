@@ -39,15 +39,17 @@ class Indexer:
         return s
         
     def write(self, outfile):
-        out = open(outfile, "w")
-        items = [(v, k) for k, v in self.d.iteritems()]
+        items = [(v, k) for k, v in self.d.items()]
         items.sort()
-        for v, k in items:
-            print >>out, k, v                
+        with open(outfile, "w") as out:
+            for v, k in items:
+                out.write("%s %s\n" % (v, k))
+        # for v, k in items:
+        #     print >>out, k, v
         out.close()
 
     def prune_vocab(self, k, cnt=False):
-        vocab_list = [(word, count) for word, count in self.vocab.iteritems()]        
+        vocab_list = [(word, count) for word, count in self.vocab.items()]
         if cnt:
             self.pruned_vocab = {pair[0]:pair[1] for pair in vocab_list if pair[1] > k}
         else:
@@ -74,7 +76,7 @@ def pad(ls, length, symbol, pad_back = True):
 
 def get_glove_words(f):
     glove_words = set()
-    for line in open(f, "r"):
+    for line in open(f, "r",encoding="utf-8"):
         word = line.split()[0].strip()
         glove_words.add(word)
     return glove_words
@@ -90,7 +92,7 @@ def get_data(args):
     def make_vocab(srcfile, targetfile, labelfile, seqlength):
         num_sents = 0
         for _, (src_orig, targ_orig, label_orig) in \
-                enumerate(itertools.izip(open(srcfile,'r'),
+                enumerate(zip(open(srcfile,'r'),
                                          open(targetfile,'r'), open(labelfile, 'r'))):
             src_orig = word_indexer.clean(src_orig.strip())
             targ_orig = word_indexer.clean(targ_orig.strip())                
@@ -126,7 +128,7 @@ def get_data(args):
         dropped = 0
         sent_id = 0
         for _, (src_orig, targ_orig, label_orig) in \
-                enumerate(itertools.izip(open(srcfile,'r'), open(targetfile,'r')
+                enumerate(zip(open(srcfile,'r'), open(targetfile,'r')
                                          ,open(labelfile,'r'))):
             src_orig = word_indexer.clean(src_orig.strip())
             targ_orig = word_indexer.clean(targ_orig.strip())
